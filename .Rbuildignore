@@ -1,2 +1,4 @@
 ^jemr\.waggle\.Rproj$
 ^\.Rproj\.user$
+^data-raw$
+^rawdatafiles$
