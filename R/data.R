@@ -81,4 +81,12 @@
 #'
 "matdat_exact_loc_r1"
 
+#' MO MAP Raw Data
+#'
+#'
+#' @format ## `mo_map_raw`
+#' A dataframe
+#'
+"mo_map_raw"
+
 
