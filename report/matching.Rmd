@@ -1,0 +1,138 @@
+---
+title: "matching"
+output: html_document
+date: "2025-04-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Import Functions, Data, and Libraries
+
+```{r}
+devtools::load_all()
+```
+
+
+# Balance for Matching w/ Location V1 (but exact matching in Grade 2)
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance(matdat_mixed , .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat_mixed $GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat_mixed  |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Location V3
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance(matdat_loc3, .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat_loc3$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat_loc3 |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Location V2
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance(matdat_loc2, .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat_loc2$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat_loc2 |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+
+# Balance for Matching w/o Location
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other",
+              "URBAN_LOC_21")
+balance(matdat, .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Location V1
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance(matdat_loc, .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat_loc$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat_loc |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Exact Location
+
+```{r}
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance(matdat_exact_loc, .b_covs = b_covs)
+cat("\n")
+for (i in levels(matdat_exact_loc$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance(matdat_exact_loc |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  cat("\n")
+}
+```
+
+
+## Export Matched Data to Excel
+
+```{r}
+#List Export Objects
+matched <- list("rawdat" = cleanFall24(),
+                "matdat_mixed" = matdat_mixed,
+                "matdat_fixedloc3" = matdat_loc3,
+                "matdat_fixedloc2" = matdat_loc2,
+                "matdat_noloc" = matdat,
+                "matdat_fixedloc" = matdat_loc,
+                "matdat_exactloc" = matdat_exact_loc
+                )
+
+#Export to Excel
+writexl::write_xlsx(matched, "matched.xlsx")
+```

@@ -2,3 +2,5 @@
 ^\.Rproj\.user$
 ^data-raw$
 ^rawdatafiles$
+^report$
+^LICENSE\.md$
