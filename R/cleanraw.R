@@ -84,3 +84,139 @@ cleanraw <- function(df){
                                ifelse(URBAN_LOC_21 == 1, 21, 0))) |>
     dplyr::mutate(LOC = factor(LOC, levels = c(0, 21,41)))
 }
+
+# pwide <- function(df){
+#
+#   # Split data by year
+#   base <- df |> dplyr::filter(TERM_NUMBER == 202404)
+#   out <- df |> dplyr::filter(TERM_NUMBER == 202502) |>
+#     dplyr::rename_with(~paste0(.x, "_out"),
+#                        !dplyr::all_of("STUDENT_BUSINESS_IDENTIFIER"))
+#
+#   # Join data
+#   dat <- out |> dplyr::left_join(base, by = "STUDENT_BUSINESS_IDENTIFIER")
+#
+#   return(list(base = base,
+#               out = out,
+#               dat = dat))
+# }
+
+pwide <- function(df, handle_dups = NULL){
+
+  # Validate handle_dups parameter if provided
+  if (!is.null(handle_dups)) {
+    handle_dups <- match.arg(handle_dups, choices = c("high", "low"))
+  }
+
+  # Helper function to handle duplicates
+  deduplicate <- function(data, method) {
+    if (is.null(method)) {
+      return(data)
+    }
+
+    if (method == "high") {
+      data |>
+        dplyr::group_by(STUDENT_BUSINESS_IDENTIFIER) |>
+        dplyr::arrange(dplyr::desc(ASSESS_SCORE)) |>
+        dplyr::slice(1) |>
+        dplyr::ungroup()
+    } else {
+      data |>
+        dplyr::group_by(STUDENT_BUSINESS_IDENTIFIER) |>
+        dplyr::arrange(ASSESS_SCORE) |>
+        dplyr::slice(1) |>
+        dplyr::ungroup()
+    }
+  }
+
+  # Split data by year and handle duplicates
+  base <- df |>
+    dplyr::filter(TERM_NUMBER == 202404) |>
+    deduplicate(handle_dups)
+
+  out <- df |>
+    dplyr::filter(TERM_NUMBER == 202502) |>
+    deduplicate(handle_dups) |>
+    dplyr::rename_with(~paste0(.x, "_out"),
+                       !dplyr::all_of("STUDENT_BUSINESS_IDENTIFIER"))
+
+  # Join data
+  dat <- out |> dplyr::left_join(base, by = "STUDENT_BUSINESS_IDENTIFIER")
+
+  return(list(base = base,
+              out = out,
+              dat = dat))
+}
+
+# pwide <- function(df){
+#
+#   # Identify the variables that should be pivoted (vary by term)
+#   # These are the variables that change between baseline and outcome
+#   pivot_vars <- c(
+#     "ASSESS_SCORE",
+#     "ASSESS_STD_ERR",
+#     "NORMS_2020_ACHIEVEMENT_PERCENTILE",
+#     "IWEEKS",
+#     "TERM_SEASON",
+#     "MPG_TEST_YN",
+#     "ASSESS_SCORE_fmean",
+#     "ASSESS_SCORE_fsd",
+#     "ASSESS_SCORE_fstd"
+#   )
+#
+#   # Create the pivoted dataset
+#   dat_wide <- df |>
+#     # Create a term label for pivoting
+#     dplyr::mutate(term_label = dplyr::case_when(
+#       TERM_NUMBER == 202404 ~ "base",
+#       TERM_NUMBER == 202502 ~ "out",
+#       TRUE ~ as.character(TERM_NUMBER)
+#     )) |>
+#     # Select student ID, term info, and variables to pivot + static variables
+#     dplyr::select(STUDENT_BUSINESS_IDENTIFIER, term_label, dplyr::all_of(pivot_vars),
+#            # Include static variables that don't change by term
+#            SCHOOL_BUSINESS_IDENTIFIER, DISTRICT_BUSINESS_IDENTIFIER,
+#            MEASUREMENT_SCALE_BID, STUDENT_GENDER, NWEA_ETHNIC_GROUP_NAME,
+#            CUSTOM_ETHNIC_GROUP_NAME, GRADE, dplyr::starts_with("NCES_"),
+#            dplyr::starts_with("SPECIAL_PROGRAM_"), SPANISH_TEST_YN,
+#            NCES_PUBLIC_CHARTER, SCHOOL_PUBLIC_FLG, treat,
+#            dplyr::starts_with("ETHNICITY"), dplyr::starts_with("GENDER_"),
+#            dplyr::starts_with("URBAN_LOC_"), LOC) |>
+#     # Remove duplicate static variables by keeping first occurrence per student
+#     dplyr::group_by(STUDENT_BUSINESS_IDENTIFIER) |>
+#     tidyr::fill(dplyr::everything(), .direction = "downup") |>
+#     dplyr::ungroup() |>
+#     # Pivot wider
+#     tidyr::pivot_wider(
+#       id_cols = c(STUDENT_BUSINESS_IDENTIFIER, SCHOOL_BUSINESS_IDENTIFIER,
+#                   DISTRICT_BUSINESS_IDENTIFIER, MEASUREMENT_SCALE_BID,
+#                   STUDENT_GENDER, NWEA_ETHNIC_GROUP_NAME, CUSTOM_ETHNIC_GROUP_NAME,
+#                   GRADE, dplyr::starts_with("NCES_"), dplyr::starts_with("SPECIAL_PROGRAM_"),
+#                   SPANISH_TEST_YN, NCES_PUBLIC_CHARTER, SCHOOL_PUBLIC_FLG, treat,
+#                   dplyr::starts_with("ETHNICITY"), dplyr::starts_with("GENDER_"),
+#                   dplyr::starts_with("URBAN_LOC_"), LOC),
+#       names_from = term_label,
+#       values_from = dplyr::all_of(pivot_vars),
+#       names_sep = "_"
+#     )
+#
+#   # # Check the result
+#   # str(dat_wide)
+#   # head(dat_wide)
+#   #
+#   # # Verify we have the expected columns
+#   # baseline_cols <- grep("_base$", names(dat_wide), value = TRUE)
+#   # outcome_cols <- grep("_out$", names(dat_wide), value = TRUE)
+#   #
+#   # cat("Baseline columns:\n")
+#   # print(baseline_cols)
+#   # cat("\nOutcome columns:\n")
+#   # print(outcome_cols)
+#   #
+#   # # Check for students with both baseline and outcome data
+#   # complete_students <- dat_wide |>
+#   #   dplyr::filter(!is.na(ASSESS_SCORE_base) & !is.na(ASSESS_SCORE_out)) |>
+#   #   nrow()
+#   #
+#   # cat(paste("\nNumber of students with both baseline and outcome data:", complete_students))
+# }
