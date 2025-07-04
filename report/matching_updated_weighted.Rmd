@@ -1,0 +1,97 @@
+---
+title: "matching_updated_weighted"
+output: html_document
+date: "2025-07-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Import Functions, Data, and Libraries
+
+```{r}
+devtools::load_all()
+rawdat <- cleanraw(mo_map_raw) 
+alldat <- rawdat |> pwide(handle_dups = "high")
+bdat <- alldat$base
+odat <- alldat$out
+newdat <- alldat$dat |> dplyr::mutate(match_weight = ifelse(treat == 1, 1, 0.5))
+```
+
+
+# Balance for Matching w/ Location V1
+
+```{r}
+dat1 <- newdat |>
+  dplyr::filter(STUDENT_BUSINESS_IDENTIFIER %in% matdat_loc$STUDENT_BUSINESS_IDENTIFIER)
+
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance_w(dat1, .b_covs = b_covs, .weight = "match_weight")
+cat("\n")
+for (i in levels(dat1$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance_w(dat1 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "match_weight")
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Location V3
+
+```{r}
+dat2 <- newdat |>
+  dplyr::filter(STUDENT_BUSINESS_IDENTIFIER %in% matdat_loc3$STUDENT_BUSINESS_IDENTIFIER)
+
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance_w(dat2, .b_covs = b_covs, .weight = "match_weight")
+cat("\n")
+for (i in levels(dat2$GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance_w(dat2 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "match_weight")
+  cat("\n")
+}
+```
+
+
+# Balance for Matching w/ Location V1 (but exact matching in Grade 2)
+
+```{r}
+dat3 <- newdat |>
+  dplyr::filter(STUDENT_BUSINESS_IDENTIFIER %in% matdat_mixed$STUDENT_BUSINESS_IDENTIFIER)
+
+b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
+              "GENDER_MALE", "GENDER_FEMALE",
+              "ETHNICITY_White", "ETHNICITY_Hispanic",
+              "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
+balance_w(dat3 , .b_covs = b_covs, .weight = "match_weight")
+cat("\n")
+for (i in levels(dat3 $GRADE)) {
+  cat("Grade: ", i, "\n")
+  balance_w(dat3 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "match_weight")
+  cat("\n")
+}
+```
+
+
+## Export Matched Data to Excel
+
+```{r}
+#List Export Objects
+updated_matched_weighted <- list("rawdat" = rawdat,
+                                 "formatted_rawdat" = newdat,
+                                 "main" = dat1,
+                                 "appA" = dat2,
+                                 "appB" = dat3
+                                 )
+
+#Export to Excel
+writexl::write_xlsx(updated_matched_weighted, "updated_matched_weighted.xlsx")
+```
