@@ -17,5 +17,6 @@ LazyDataCompression: xz
 Imports: 
     dplyr,
     MatchIt,
+    rlang,
     survey,
     tableone

@@ -132,7 +132,9 @@ pwide <- function(df, handle_dups = NULL){
   # Split data by year and handle duplicates
   base <- df |>
     dplyr::filter(TERM_NUMBER == 202404) |>
-    deduplicate(handle_dups)
+    deduplicate(handle_dups)|>
+    dplyr::rename_with(~paste0(.x, "_base"),
+                       !dplyr::all_of("STUDENT_BUSINESS_IDENTIFIER"))
 
   out <- df |>
     dplyr::filter(TERM_NUMBER == 202502) |>

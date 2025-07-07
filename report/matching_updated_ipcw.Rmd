@@ -1,7 +1,7 @@
 ---
-title: "matching_updated"
+title: "matching_updated_icpw"
 output: html_document
-date: "2025-07-02"
+date: "2025-07-04"
 ---
 
 ```{r setup, include=FALSE}
@@ -30,11 +30,11 @@ b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
               "GENDER_MALE", "GENDER_FEMALE",
               "ETHNICITY_White", "ETHNICITY_Hispanic",
               "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
-balance_w(dat1, .b_covs = b_covs)
+balance_w(dat1, .b_covs = b_covs, .weight = "w_final")
 cat("\n")
 for (i in levels(dat1$GRADE)) {
   cat("Grade: ", i, "\n")
-  balance_w(dat1 |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  balance_w(dat1 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "w_final")
   cat("\n")
 }
 ```
@@ -49,11 +49,11 @@ b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
               "GENDER_MALE", "GENDER_FEMALE",
               "ETHNICITY_White", "ETHNICITY_Hispanic",
               "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
-balance_w(dat2, .b_covs = b_covs)
+balance_w(dat2, .b_covs = b_covs, .weight = "w_final")
 cat("\n")
 for (i in levels(dat2$GRADE)) {
   cat("Grade: ", i, "\n")
-  balance_w(dat2 |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  balance_w(dat2 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "w_final")
   cat("\n")
 }
 ```
@@ -68,11 +68,11 @@ b_covs = list("ASSESS_SCORE", "NCES_PUBLIC_PCTFRLUNCH_ROUNDED",
               "GENDER_MALE", "GENDER_FEMALE",
               "ETHNICITY_White", "ETHNICITY_Hispanic",
               "ETHNICITY_Black", "ETHNICITY_Other", "URBAN_LOC_21")
-balance_w(dat3 , .b_covs = b_covs)
+balance_w(dat3 , .b_covs = b_covs, .weight = "w_final")
 cat("\n")
 for (i in levels(dat3 $GRADE)) {
   cat("Grade: ", i, "\n")
-  balance_w(dat3 |> dplyr::filter(GRADE == i), .b_covs = b_covs)
+  balance_w(dat3 |> dplyr::filter(GRADE == i), .b_covs = b_covs, .weight = "w_final")
   cat("\n")
 }
 ```
@@ -82,7 +82,7 @@ for (i in levels(dat3 $GRADE)) {
 
 ```{r}
 #List Export Objects
-updated_matched <- list("rawdat" = rawdat,
+updated_matched_ipcw <- list("rawdat" = rawdat,
                 "formatted_rawdat" = newdat,
                 "Location_V1" = dat1,
                 "Location_V3" = dat2,
@@ -90,5 +90,5 @@ updated_matched <- list("rawdat" = rawdat,
                 )
 
 #Export to Excel
-writexl::write_xlsx(updated_matched, "updated_matched.xlsx")
+writexl::write_xlsx(updated_matched_ipcw, "updated_matched_ipcw.xlsx")
 ```
