@@ -1,0 +1,32 @@
+---
+title: "analysis_growth"
+output: html_document
+date: "2025-07-07"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Import Functions, Data, and Libraries
+
+```{r}
+devtools::load_all()
+rawdat <- cleanraw(mo_map_raw) 
+alldat <- rawdat |> pwide(handle_dups = "high")
+bdat <- alldat$base
+odat <- alldat$out
+newdat <- alldat$dat
+dat2 <- build_analysis_sets(out_data = newdat, orig_matched_data = matdat_loc3)$cc
+```
+
+
+# Analysis
+
+```{r}
+dat_growth <- get_analytic_sample(dat = dat2, .analysis = "growth",
+                                  .group = 'GRADE == "1"')
+dat_badj <- get_analytic_sample(dat = dat2, .analysis = "badj", .group = 'GRADE == "1"')
+```
+
