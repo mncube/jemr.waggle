@@ -15,8 +15,13 @@ Depends:
 LazyData: true
 LazyDataCompression: xz
 Imports: 
+    broom,
     dplyr,
+    emmeans,
+    ggeffects,
+    ggplot2,
     MatchIt,
+    parameters,
     rlang,
     survey,
     tableone

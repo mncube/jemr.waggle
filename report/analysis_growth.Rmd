@@ -19,10 +19,40 @@ bdat <- alldat$base
 odat <- alldat$out
 newdat <- alldat$dat
 dat2 <- build_analysis_sets(out_data = newdat, orig_matched_data = matdat_loc3)$cc
+dat2 <- dat2 |> identify_bottom_percentiles(percentiles = c(0.2, 0.3),
+                                   id_var= "STUDENT_BUSINESS_IDENTIFIER",
+                                   score_var  = "ASSESS_SCORE",
+                                   group_var  = "GRADE")
+```
+
+# Analysis
+
+```{r}
+ res <- model_workflow(dat2,
+                   modname = c("All", "Male", "Female"),
+                   group = c("All",
+                             'GENDER_MALE == 1',
+                             'GENDER_FEMALE == 1'),
+                   .control = c("GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21"),
+                   .analysis = "growth")
+
 ```
 
 
-# Analysis
+```{r}
+ mods <- run_model(dat2,
+                   modname = c("All", "Male", "Female"),
+                   group = c("All",
+                             'GENDER_MALE == 1',
+                             'GENDER_FEMALE == 1'),
+                   .control = c("GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21"),
+                   .analysis = "growth")
+```
+
 
 ```{r}
 dat_growth <- get_analytic_sample(dat = dat2, .analysis = "growth",

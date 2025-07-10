@@ -144,4 +144,67 @@ filter_by_grade <- function(dat) {
   return(filtered_data)
 }
 
-# tst <- cleanFall24()
+#' Flag bottom‐percentile students (optionally by grade)
+#'
+#' @param data A data.frame (e.g. your matched dataset) containing at least
+#'   the student ID column and, if using by_grade, the grade column.
+#' @param percentiles Numeric vector of percentiles to flag
+#'   (e.g. c(0.2, 0.3) or c(20, 30)).
+#' @param id_var Name of the student‐ID column (default "STUDENT_BUSINESS_IDENTIFIER").
+#' @param score_var Name of the score variable in cleanFall24()
+#'   (default "ASSESS_SCORE_fstd").
+#' @param group_var Optional name of a grouping column (e.g. "GRADE").
+#'   If non‐NULL, thresholds are computed separately within each group.
+#'
+#' @return `data` with new logical columns `bottom_20`, `bottom_30`, etc.,
+#'   indicating whether each student falls in that bottom percentile—
+#'   either overall or within their grade.
+identify_bottom_percentiles <- function(data,
+                                        percentiles,
+                                        id_var     = "STUDENT_BUSINESS_IDENTIFIER",
+                                        score_var  = "ASSESS_SCORE",
+                                        group_var  = NULL) {
+  # 1. Get cleaned pre‐matched sample
+  cleaned <- cleanFall24()
+
+  # 2. Normalize percentiles to 0–1
+  p <- as.numeric(percentiles)
+  if (any(p > 1)) p <- p / 100
+
+  # 3. Prep output
+  out <- data
+
+  # 4. If no grouping, do as before:
+  if (is.null(group_var)) {
+    thr <- stats::quantile(cleaned[[score_var]], probs = p, na.rm = TRUE)
+    names(thr) <- paste0("bottom_", gsub("%", "", names(thr)))
+
+    for (nm in names(thr)) {
+      ids <- cleaned[[id_var]][ cleaned[[score_var]] <= thr[nm] ]
+      out[[nm]] <- out[[id_var]] %in% ids
+    }
+
+  } else {
+    # 4a. We'll build a nested list: thresholds[[grade]][percentile]
+    grades <- unique(cleaned[[group_var]])
+    # initialize flag columns
+    pct_names <- paste0("bottom_", round(p * 100))
+    for (nm in pct_names) out[[nm]] <- FALSE
+
+    for (g in grades) {
+      sub <- cleaned[ cleaned[[group_var]] == g, ]
+      if (nrow(sub) == 0) next
+      thr_g <- stats::quantile(sub[[score_var]], probs = p, na.rm = TRUE)
+      names(thr_g) <- pct_names
+
+      for (nm in pct_names) {
+        ids_g <- sub[[id_var]][ sub[[score_var]] <= thr_g[nm] ]
+        sel <- out[[group_var]] == g & out[[id_var]] %in% ids_g
+        out[[nm]][ sel ] <- TRUE
+      }
+    }
+  }
+
+  return(out)
+}
+
