@@ -1,6 +1,6 @@
 get_analytic_sample <- function(dat,
                                 .analysis = c("growth", "badj"),
-                                .group = NULL, .control
+                                .group = NULL
 ){
 
   .analysis <- match.arg(.analysis)
@@ -60,11 +60,13 @@ get_analytic_sample <- function(dat,
 run_model <- function(.df, modname, group, .control = NULL, .analysis = "growth"){
 
   # Ensure inputs are of same length or recycle appropriately
-  max_length <- max(length(group),
+  max_length <- max(length(modname),
+                    length(group),
                     length(.control),
                     length(.analysis))
 
   # Recycle vectors if needed
+  if (length(modname) < max_length) modname <- rep(modname, length.out = max_length)
   if (length(group) < max_length) group <- rep(group, length.out = max_length)
   if (length(.control) < max_length) .control <- rep(.control, length.out = max_length)
   if (length(.analysis) < max_length) .analysis <- rep(.analysis, length.out = max_length)
@@ -75,8 +77,7 @@ run_model <- function(.df, modname, group, .control = NULL, .analysis = "growth"
     .df_mod <- get_analytic_sample(
       .df,
       .analysis[i],
-      group[i],
-      .control[i]
+      group[i]
     )
 
     # Check if treatment factor has at least two levels
