@@ -29,34 +29,48 @@ dat2 <- dat2 |> identify_bottom_percentiles(percentiles = c(0.2, 0.3),
 
 ```{r}
  res <- model_workflow(dat2,
-                   modname = c("All", "Male", "Female"),
+                   modname = c("All", "Male", "Female", "White", "Hispanic",
+                               "Black", "Other", "Kindergarten", "Grade_1",
+                               "Grade_2", "Grade_3", "Grade_4", "Grade_5",
+                               "Grade_6", "Grade_7", "Grade_8", "Bottom_20", "Bottom_30"),
                    group = c("All",
                              'GENDER_MALE == 1',
-                             'GENDER_FEMALE == 1'),
+                             'GENDER_FEMALE == 1',
+                             'ETHNICITY_White == 1',
+                             'ETHNICITY_Hispanic == 1',
+                             'ETHNICITY_Black == 1',
+                             'ETHNICITY_Other == 1',
+                             'GRADE == 0',
+                             'GRADE == 1',
+                             'GRADE == 2',
+                             'GRADE == 3',
+                             'GRADE == 4',
+                             'GRADE == 5',
+                             'GRADE == 6',
+                             'GRADE == 7',
+                             'GRADE == 8',
+                             'bottom_20 == TRUE',
+                             'bottom_30 == TRUE'
+                             ),
                    .control = c("GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
                                 "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
-                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21"),
-                   .analysis = "growth")
-
-```
-
-
-```{r}
- mods <- run_model(dat2,
-                   modname = c("All", "Male", "Female"),
-                   group = c("All",
-                             'GENDER_MALE == 1',
-                             'GENDER_FEMALE == 1'),
-                   .control = c("GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
                                 "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
-                                "GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21"),
+                                "GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + GRADE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21",
+                                "GENDER_MALE + NCES_PUBLIC_PCTFRLUNCH_ROUNDED + URBAN_LOC_21"),
                    .analysis = "growth")
-```
 
-
-```{r}
-dat_growth <- get_analytic_sample(dat = dat2, .analysis = "growth",
-                                  .group = 'GRADE == "1"')
-dat_badj <- get_analytic_sample(dat = dat2, .analysis = "badj", .group = 'GRADE == "1"')
 ```
 

@@ -110,7 +110,8 @@ run_model <- function(.df, modname, group, .control = NULL, .analysis = "growth"
     .mod <- build_model_formula(.analysis[i])
 
     tryCatch({
-      results[[paste0(modname[i], "_", .analysis[i])]] <-
+      # results[[paste0(modname[i], "_", .analysis[i])]] <-
+      results[[modname[i]]] <-
         stats::lm(stats::as.formula(.mod), data = .df_mod)
     }, error = function(e) {
       warning(paste("Error in model:", group[i], .analysis[i], "-", e$message))
@@ -145,13 +146,13 @@ plot_model_results <- function(run_model_results, terms = "treat"){
       predictions <- ggeffects::ggpredict(model, terms = terms)
 
       # Determine y-axis label based on model name suffix
-      if (endsWith(model_name, "_badj")){
-        .y_lab <- "Percent Proficient"
-      } else if (endsWith(model_name, "growth")) {
+      # if (endsWith(model_name, "_badj")){
+      #   .y_lab <- "Percent Proficient"
+      # } else if (endsWith(model_name, "growth")) {
         .y_lab <- "Assessment Score Growth"
-      } else {
-        .y_lab <- "Outcome"  # Default label if neither BA nor G
-      }
+      # } else {
+      #   .y_lab <- "Outcome"  # Default label if neither BA nor G
+      # }
 
       # Parse model name to create a more readable title
       name_parts <- strsplit(model_name, "_")[[1]]
